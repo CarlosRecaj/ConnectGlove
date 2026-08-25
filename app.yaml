@@ -1,0 +1,8 @@
+name: Versio OG
+description: Letter Detection with Edge Impulse object on Arduino UNO Q
+ports:
+- 5001
+bricks:
+- arduino:video_object_detection:
+    model: ei-model-1070149-2
+icon: 👍
