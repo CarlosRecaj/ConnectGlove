@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Speller — Arduino UNO Q</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #15161c;
+    --surface: #1e2029;
+    --surface-2: #262835;
+    --tile-bg: #ede4cf;
+    --tile-ink: #15161c;
+    --tile-space: #2c2e3a;
+    --accent-blue: #3e7bfa;
+    --accent-gold: #e3a83b;
+    --text: #e7e7ec;
+    --text-muted: #9098aa;
+    --border: #33364499;
+    --font-display: 'Space Grotesk', 'Avenir Next', system-ui, sans-serif;
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    display: flex;
+    justify-content: center;
+    padding: clamp(20px, 5vw, 48px) 16px 64px;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-blue);
+    margin: 0 0 6px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 6vw, 38px);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 28px;
+    max-width: 40ch;
+  }
+
+  /* ── Viewfinder ─────────────────────────────────────────── */
+.viewfinder {
+    position: relative;
+    background: var(--surface);
+    border-radius: 18px;
+    /* S'ha reduït el padding vertical (abans: 36px 24px 22px) */
+    padding: 20px 14px 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--accent-blue);
+    opacity: 0.7;
+    transition: border-color 0.3s ease;
+  }
+  .corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; border-radius: 4px 0 0 0; }
+  .corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; border-radius: 0 4px 0 0; }
+  .corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; border-radius: 0 0 0 4px; }
+  .corner.br { bottom: 12px; right: 12px; border-left: none; border-top: none; border-radius: 0 0 4px 0; }
+
+  .viewfinder.locked .corner { border-color: var(--accent-gold); }
+
+  .detected-letter {
+      font-family: var(--font-display);
+      font-weight: 700;
+      /* S'ha reduït lleugerament la mida màxima de la font (abans fins a 120px) */
+      font-size: clamp(64px, 20vw, 96px);
+      line-height: 1;
+      text-align: center;
+      /* S'han reduït els marges superior i inferior (abans: 8px 0 18px) */
+      margin: 4px 0 12px;
+      color: var(--text);
+      transition: color 0.3s ease;
+    }  
+  .detected-letter.empty { color: var(--text-muted); opacity: 0.4; }
+  .viewfinder.locked .detected-letter { color: var(--accent-gold); }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .viewfinder.locked .status-dot { background: var(--accent-gold); animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.7); }
+  }
+
+  .confidence-bar {
+    width: 96px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .confidence-fill {
+    height: 100%;
+    background: var(--accent-blue);
+    width: 0%;
+    transition: width 0.25s ease;
+  }
+  .viewfinder.locked .confidence-fill { background: var(--accent-gold); }
+
+  /* ── Capture button ─────────────────────────────────────── */
+  .capture-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 64px;
+    border: none;
+    border-radius: 32px;
+    background: var(--accent-blue);
+    color: #0b0c10;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-bottom: 24px;
+    transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+  }
+  .capture-btn:hover:not(:disabled) { background: #5c90fb; }
+  .capture-btn:active:not(:disabled) { transform: scale(0.98); }
+  .capture-btn:disabled { background: var(--surface-2); color: var(--text-muted); cursor: default; }
+  .capture-btn:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+  .capture-btn.counting { background: var(--accent-gold); color: #0b0c10; font-size: 28px; }
+  .capture-btn.result { background: var(--surface-2); color: var(--accent-gold); }
+
+  /* ── Split-flap word display ────────────────────────────── */
+  .board-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+  }
+
+  .board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 56px;
+    padding: 14px;
+    background: var(--surface);
+    border-radius: 14px;
+    margin-bottom: 8px;
+  }
+
+  .board.empty-state {
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: var(--font-mono);
+  }
+
+  .tile {
+    width: 40px;
+    height: 48px;
+    background: var(--tile-bg);
+    color: var(--tile-ink);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .tile.tile-space {
+    width: 20px;
+    background: var(--tile-space);
+  }
+
+  .tile.flip-in {
+    animation: flip 0.4s ease;
+  }
+
+  @keyframes flip {
+    0%   { transform: rotateX(90deg); opacity: 0; }
+    60%  { transform: rotateX(-12deg); opacity: 1; }
+    100% { transform: rotateX(0deg); }
+  }
+
+  /* ── Controls ────────────────────────────────────────────── */
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .ctrl-btn {
+    flex: 1;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .ctrl-btn:hover { border-color: var(--accent-blue); color: var(--text); }
+  .ctrl-btn:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+
+  /* ── History ─────────────────────────────────────────────── */
+  .history-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+  }
+
+  .history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  .history-item .idx { color: var(--text-muted); width: 28px; }
+  .history-item .letter { color: var(--text); font-weight: 500; flex: 1; }
+  .history-item .conf { color: var(--text-muted); }
+
+  .history-empty {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 10px 2px;
+  }
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot { animation: none; }
+    .tile.flip-in { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <p class="eyebrow">Arduino UNO Q · Edge Impulse</p>
+    <h1>Sign Speller</h1>
+    <p class="subtitle">Fes el signe d'una lletra davant la càmera i prem «Capturar» per afegir-la a la paraula.</p>
+
+    <div class="viewfinder" id="viewfinder">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="detected-letter empty" id="detectedLetter">–</div>
+      <div class="status-row">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">detectant…</span>
+        <div class="confidence-bar"><div class="confidence-fill" id="confidenceFill"></div></div>
+        <span id="confidenceText">0%</span>
+      </div>
+    </div>
+
+    <button class="capture-btn" id="captureBtn">Capturar</button>
+
+    <p class="board-label">Paraula</p>
+    <div class="board" id="board"></div>
+
+    <div class="controls">
+      <button class="ctrl-btn" id="spaceBtn">␣ Espai</button>
+      <button class="ctrl-btn" id="backspaceBtn">⌫ Esborrar</button>
+      <button class="ctrl-btn" id="clearBtn">Netejar tot</button>
+    </div>
+
+    <p class="history-label">Captures recents</p>
+    <ul class="history-list" id="historyList"></ul>
+
+    <footer>sign_speller · localhost:5001</footer>
+  </div>
+
+<script>
+  const viewfinder = document.getElementById('viewfinder');
+  const detectedLetter = document.getElementById('detectedLetter');
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const confidenceFill = document.getElementById('confidenceFill');
+  const confidenceText = document.getElementById('confidenceText');
+  const captureBtn = document.getElementById('captureBtn');
+  const board = document.getElementById('board');
+  const historyList = document.getElementById('historyList');
+  const spaceBtn = document.getElementById('spaceBtn');
+  const backspaceBtn = document.getElementById('backspaceBtn');
+  const clearBtn = document.getElementById('clearBtn');
+
+  let lastRound = 0;
+  let lastText = '';
+
+  function renderBoard(text) {
+    const grew = text.length > lastText.length && text.startsWith(lastText.slice(0, -1) === text.slice(0, -1) ? lastText.slice(0, text.length - 1) : lastText);
+    board.innerHTML = '';
+    board.classList.toggle('empty-state', text.length === 0);
+    if (text.length === 0) {
+      board.textContent = 'Encara no hi ha res escrit — mostra una lletra i prem Capturar.';
+      lastText = text;
+      return;
+    }
+    [...text].forEach((ch, i) => {
+      const tile = document.createElement('div');
+      const isSpace = ch === ' ';
+      tile.className = 'tile' + (isSpace ? ' tile-space' : '');
+      tile.textContent = isSpace ? '' : ch;
+      if (i === text.length - 1 && text.length > lastText.length) {
+        tile.classList.add('flip-in');
+      }
+      board.appendChild(tile);
+    });
+    lastText = text;
+  }
+
+  function renderHistory(history) {
+    if (!history.length) {
+      historyList.innerHTML = '<li class="history-empty">Encara no hi ha captures.</li>';
+      return;
+    }
+    historyList.innerHTML = '';
+    history.slice(0, 6).forEach(item => {
+      const li = document.createElement('li');
+      li.className = 'history-item';
+      li.innerHTML = `
+        <span class="idx">#${item.round}</span>
+        <span class="letter">${item.captured || 'sense detecció'}</span>
+        <span class="conf">${Math.round((item.confidence || 0) * 100)}%</span>
+      `;
+      historyList.appendChild(li);
+    });
+  }
+
+  async function refresh() {
+    try {
+      const res = await fetch('/api/state');
+      const s = await res.json();
+
+      const isLocked = s.state !== 'idle';
+      viewfinder.classList.toggle('locked', isLocked);
+
+      const liveLabel = s.detection ? s.detection.toUpperCase() : '–';
+      detectedLetter.textContent = liveLabel;
+      detectedLetter.classList.toggle('empty', !s.detection);
+
+      confidenceFill.style.width = `${Math.round((s.confidence || 0) * 100)}%`;
+      confidenceText.textContent = `${Math.round((s.confidence || 0) * 100)}%`;
+
+      if (s.state === 'idle') {
+        statusText.textContent = 'detectant…';
+      } else if (s.state === 'countdown') {
+        statusText.textContent = 'mantén el signe';
+      } else if (s.state === 'evaluating') {
+        statusText.textContent = 'llegint…';
+      } else if (s.state === 'result') {
+        statusText.textContent = 'capturat';
+      }
+
+      captureBtn.classList.remove('counting', 'result');
+      if (s.state === 'idle') {
+        captureBtn.textContent = 'Capturar';
+        captureBtn.disabled = false;
+      } else if (s.state === 'countdown') {
+        captureBtn.textContent = s.countdown;
+        captureBtn.classList.add('counting');
+        captureBtn.disabled = true;
+      } else if (s.state === 'evaluating') {
+        captureBtn.textContent = '…';
+        captureBtn.disabled = true;
+      } else if (s.state === 'result') {
+        captureBtn.textContent = s.capturedLetter ? `+ ${s.capturedLetter}` : 'sense detecció';
+        captureBtn.classList.add('result');
+        captureBtn.disabled = true;
+      }
+
+      renderBoard(s.spelledText || '');
+      renderHistory(s.history || []);
+      lastRound = s.round;
+    } catch (e) {
+      statusText.textContent = 'sense connexió';
+    }
+  }
+
+  captureBtn.addEventListener('click', () => fetch('/api/capture', { method: 'POST' }));
+  spaceBtn.addEventListener('click', () => fetch('/api/space', { method: 'POST' }).then(refresh));
+  backspaceBtn.addEventListener('click', () => fetch('/api/backspace', { method: 'POST' }).then(refresh));
+  clearBtn.addEventListener('click', () => fetch('/api/reset', { method: 'POST' }).then(refresh));
+
+  refresh();
+  setInterval(refresh, 400);
+</script>
+</body>
+</html>
