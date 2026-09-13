@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,11 +69,11 @@
   }
 
   /* ── Viewfinder ─────────────────────────────────────────── */
-.viewfinder {
+  .viewfinder {
     position: relative;
     background: var(--surface);
     border-radius: 18px;
-    /* S'ha reduït el padding vertical (abans: 36px 24px 22px) */
+    /* Vertical padding reduced (previously: 36px 24px 22px) */
     padding: 20px 14px 16px;
     margin-bottom: 20px;
     overflow: hidden;
@@ -97,11 +97,11 @@
   .detected-letter {
       font-family: var(--font-display);
       font-weight: 700;
-      /* S'ha reduït lleugerament la mida màxima de la font (abans fins a 120px) */
+      /* Maximum font size slightly reduced (previously up to 120px) */
       font-size: clamp(64px, 20vw, 96px);
       line-height: 1;
       text-align: center;
-      /* S'han reduït els marges superior i inferior (abans: 8px 0 18px) */
+      /* Top and bottom margins reduced (previously: 8px 0 18px) */
       margin: 4px 0 12px;
       color: var(--text);
       transition: color 0.3s ease;
@@ -318,7 +318,7 @@
   <div class="page">
     <p class="eyebrow">Arduino UNO Q · Edge Impulse</p>
     <h1>Sign Speller</h1>
-    <p class="subtitle">Fes el signe d'una lletra davant la càmera i prem «Capturar» per afegir-la a la paraula.</p>
+    <p class="subtitle">Make a letter sign in front of the camera and press "Capture" to add it to the word.</p>
 
     <div class="viewfinder" id="viewfinder">
       <div class="corner tl"></div>
@@ -328,24 +328,24 @@
       <div class="detected-letter empty" id="detectedLetter">–</div>
       <div class="status-row">
         <span class="status-dot" id="statusDot"></span>
-        <span id="statusText">detectant…</span>
+        <span id="statusText">detecting…</span>
         <div class="confidence-bar"><div class="confidence-fill" id="confidenceFill"></div></div>
         <span id="confidenceText">0%</span>
       </div>
     </div>
 
-    <button class="capture-btn" id="captureBtn">Capturar</button>
+    <button class="capture-btn" id="captureBtn">Capture</button>
 
-    <p class="board-label">Paraula</p>
+    <p class="board-label">Word</p>
     <div class="board" id="board"></div>
 
     <div class="controls">
-      <button class="ctrl-btn" id="spaceBtn">␣ Espai</button>
-      <button class="ctrl-btn" id="backspaceBtn">⌫ Esborrar</button>
-      <button class="ctrl-btn" id="clearBtn">Netejar tot</button>
+      <button class="ctrl-btn" id="spaceBtn">␣ Space</button>
+      <button class="ctrl-btn" id="backspaceBtn">⌫ Backspace</button>
+      <button class="ctrl-btn" id="clearBtn">Clear all</button>
     </div>
 
-    <p class="history-label">Captures recents</p>
+    <p class="history-label">Recent captures</p>
     <ul class="history-list" id="historyList"></ul>
 
     <footer>sign_speller · localhost:5001</footer>
@@ -373,7 +373,7 @@
     board.innerHTML = '';
     board.classList.toggle('empty-state', text.length === 0);
     if (text.length === 0) {
-      board.textContent = 'Encara no hi ha res escrit — mostra una lletra i prem Capturar.';
+      board.textContent = 'Nothing written yet — show a letter and press Capture.';
       lastText = text;
       return;
     }
@@ -392,7 +392,7 @@
 
   function renderHistory(history) {
     if (!history.length) {
-      historyList.innerHTML = '<li class="history-empty">Encara no hi ha captures.</li>';
+      historyList.innerHTML = '<li class="history-empty">No captures yet.</li>';
       return;
     }
     historyList.innerHTML = '';
@@ -401,7 +401,7 @@
       li.className = 'history-item';
       li.innerHTML = `
         <span class="idx">#${item.round}</span>
-        <span class="letter">${item.captured || 'sense detecció'}</span>
+        <span class="letter">${item.captured || 'no detection'}</span>
         <span class="conf">${Math.round((item.confidence || 0) * 100)}%</span>
       `;
       historyList.appendChild(li);
@@ -424,18 +424,18 @@
       confidenceText.textContent = `${Math.round((s.confidence || 0) * 100)}%`;
 
       if (s.state === 'idle') {
-        statusText.textContent = 'detectant…';
+        statusText.textContent = 'detecting…';
       } else if (s.state === 'countdown') {
-        statusText.textContent = 'mantén el signe';
+        statusText.textContent = 'hold the sign';
       } else if (s.state === 'evaluating') {
-        statusText.textContent = 'llegint…';
+        statusText.textContent = 'reading…';
       } else if (s.state === 'result') {
-        statusText.textContent = 'capturat';
+        statusText.textContent = 'captured';
       }
 
       captureBtn.classList.remove('counting', 'result');
       if (s.state === 'idle') {
-        captureBtn.textContent = 'Capturar';
+        captureBtn.textContent = 'Capture';
         captureBtn.disabled = false;
       } else if (s.state === 'countdown') {
         captureBtn.textContent = s.countdown;
@@ -445,7 +445,7 @@
         captureBtn.textContent = '…';
         captureBtn.disabled = true;
       } else if (s.state === 'result') {
-        captureBtn.textContent = s.capturedLetter ? `+ ${s.capturedLetter}` : 'sense detecció';
+        captureBtn.textContent = s.capturedLetter ? `+ ${s.capturedLetter}` : 'no detection';
         captureBtn.classList.add('result');
         captureBtn.disabled = true;
       }
@@ -454,7 +454,7 @@
       renderHistory(s.history || []);
       lastRound = s.round;
     } catch (e) {
-      statusText.textContent = 'sense connexió';
+      statusText.textContent = 'no connection';
     }
   }
 
