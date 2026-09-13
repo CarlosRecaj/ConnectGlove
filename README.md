@@ -33,7 +33,7 @@ Millions of non-verbal people rely on sign language for everyday communication. 
 ### Solution. 
 **ConnectGlove** captures hand movements and positions via an HD camera and a custom glove prototype that increases model precision. It interprets them through an Artificial Intelligence model trained specifically for the LSE fingerspelling alphabet and one-handed gestures.
 
-> **Acknowledgments:** This project is heavily inspired by and based on the [Edge Impulse Rock-Paper-Scissors Arduino UNO Q Example](https://github.com/edgeimpulse/example-rock-paper-scissors-Arduino-UNO-Q/blob/main/README.md). We adapted their excellent computer vision deployment pipeline to fit our sign-language recognition needs.
+> **Acknowledgments:** This project is inspired by and based on the [Edge Impulse Rock-Paper-Scissors Arduino UNO Q Example](https://github.com/edgeimpulse/example-rock-paper-scissors-Arduino-UNO-Q/blob/main/README.md). We adapted their computer vision deployment pipeline to fit our sign-language recognition needs.
 
 ### 🎥 Project Video & Documentation
 
