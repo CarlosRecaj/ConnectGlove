@@ -125,8 +125,7 @@ The gesture recognition model was trained using **Edge Impulse**. You can view, 
 
 <p align="center">
   <br>
-  <!-- 📷 [PLACEHOLDER: Add a screenshot of the Arduino App Lab / Model selection here] -->
-  <img src="URL_TO_APP_LAB_SCREENSHOT.jpg" alt="Arduino App Lab Deployment" width="600"/>
+  <img src="assets\img\applab.jpg" alt="Arduino App Lab Deployment" width="600"/>
   <br><br>
 </p>
 
@@ -138,8 +137,7 @@ The gesture recognition model was trained using **Edge Impulse**. You can view, 
 
 <p align="center">
   <br>
-  <!-- 📷 [PLACEHOLDER: Add a screenshot of the web interface running at port 5001 here] -->
-  <img src="URL_TO_WEB_INTERFACE.jpg" alt="Web Interface" width="600"/>
+  <img src="assets\img\frontend.jpg" alt="Web Interface" width="600"/>
   <br><br>
 </p>
 
