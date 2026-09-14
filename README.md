@@ -39,9 +39,8 @@ Millions of non-verbal people rely on sign language for everyday communication. 
 
 <p align="center">
   <br><br>
-  <!-- 📷 [PLACEHOLDER: Add a link/thumbnail to your English demonstration video] -->
-  <a href="YOUR_VIDEO">
-    <img src="assets\vid\pres_video.mp4" alt="Watch the demonstration video" width="600"/>
+  <a href="assets/vid/pres_video.mp4">
+    <img src="assets/vid/miniatura_video.jpg" alt="Mira el vídeo de demostració" width="600"/>
   </a>
   <br><br>
 </p>
