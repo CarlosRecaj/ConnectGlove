@@ -37,13 +37,16 @@ Millions of non-verbal people rely on sign language for everyday communication. 
 
 ### 🎥 Project Video & Documentation
 
-<p align="center">
+Perque no es veu el video: <p align="center">
+
   <br><br>
-  <a href="assets/vid/pres_video.mp4">
-    <img src="assets/vid/miniatura_video.jpg" alt="Mira el vídeo de demostració" width="600"/>
+  <a href="YOUR_VIDEO">
+    <img src="[video](https://youtu.be/uT-AzWmbxFI)" alt="Watch the demonstration video" width="600"/>
   </a>
   <br><br>
-</p>
+</p> 
+
+
 
 ### ✨ Key Features
 *   **Real-time detection:** Gesture recognition with no perceivable delay.
