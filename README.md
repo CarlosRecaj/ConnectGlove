@@ -40,8 +40,8 @@ Millions of non-verbal people rely on sign language for everyday communication. 
 <p align="center">
   <br><br>
   <!-- 📷 [PLACEHOLDER: Add a link/thumbnail to your English demonstration video] -->
-  <a href="YOUR_VIDEO_URL">
-    <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg" alt="Watch the demonstration video" width="600"/>
+  <a href="YOUR_VIDEO">
+    <img src="assets\vid\pres_video.mp4" alt="Watch the demonstration video" width="600"/>
   </a>
   <br><br>
 </p>
