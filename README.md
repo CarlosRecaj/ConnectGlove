@@ -37,15 +37,13 @@ Millions of non-verbal people rely on sign language for everyday communication. 
 
 ### 🎥 Project Video & Documentation
 
-Perque no es veu el video: <p align="center">
-
+<p align="center">
   <br><br>
-  <a href="YOUR_VIDEO">
-    <img src="[video](https://youtu.be/uT-AzWmbxFI)" alt="Watch the demonstration video" width="600"/>
+  <a href="https://youtu.be/uT-AzWmbxFI" target="_blank">
+    <img src="https://img.youtube.com/vi/uT-AzWmbxFI/maxresdefault.jpg" alt="Watch the demonstration video" width="600"/>
   </a>
   <br><br>
-</p> 
-
+</p>
 
 
 ### ✨ Key Features
